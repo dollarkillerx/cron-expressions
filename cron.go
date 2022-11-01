@@ -1,6 +1,11 @@
 package cron_expressions
 
-import "strconv"
+import (
+	"fmt"
+	"github.com/aptible/supercronic/cronexpr"
+	"strconv"
+	"time"
+)
 
 /**
 
@@ -34,6 +39,26 @@ func Expressions() *CronExpressions {
 
 	// '？'只能在日和星期（周）中指定使用，其作用为不指定
 	// '? 'Can only be specified in day and week (week), its effect is not specified
+}
+
+// StringAccurate 精確到秒, accurate to the second
+func (c *CronExpressions) StringAccurate() string {
+	return fmt.Sprintf("%s %s %s %s %s %s", c.second, c.minute, c.hour, c.day, c.moon, c.week)
+}
+
+// String
+func (c *CronExpressions) String() string {
+	return fmt.Sprintf("%s %s %s %s %s", c.minute, c.hour, c.day, c.moon, c.week)
+}
+
+// NextTime 獲取下一次執行時間
+func (c *CronExpressions) NextTime() time.Time {
+	next := cronexpr.MustParse(c.String()).Next(time.Now())
+	if time.Now().Unix() >= next.Unix() {
+		next = cronexpr.MustParse(c.String()).Next(next)
+	}
+
+	return next
 }
 
 // Second 秒
